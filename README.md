@@ -60,11 +60,15 @@ See node availability [here](https://www.cloudlab.us/resinfo.php#)
 
 Note - There may be more profiles/nodes that I missed. Check out [Nvidia list](https://developer.nvidia.com/cuda-gpus) and cross reference with [CloudLab hardware](http://emulab.pages.flux.utah.edu/testbed-manual/cloudlab-manual/hardware.html). Not sure if that's a comprehensive Nvidia list atm
 
-Install miniconda:
+Download miniconda:
 ```bash
 wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+```
+Install miniconda:
+```bash
 bash Miniconda3-latest-Linux-x86_64.sh
 ```
+
 Activate miniconda:
 ```bash
 source ~/miniconda3/bin/activate
