@@ -49,3 +49,49 @@ sudo add-apt-repository universe
 sudo apt install python3-pip
 ```
 
+#### Installing conda and vLLM - SHOULD BE ABLE TO START HERE
+
+IMPORTANT - Run on a GPU with compute capability of 7.0 or higher (see vLLM docs). The following are profiles I've cross-referenced w/Nvidia docs that should work:
+* d8545
+* nvidiagh
+
+Install miniconda:
+```bash
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+bash Miniconda3-latest-Linux-x86_64.sh
+```
+Activate miniconda:
+```bash
+source ~/miniconda3/bin/activate
+```
+
+Download vLLM (will take a few minutes):
+```bash
+pip install vllm
+```
+
+Download wheel for vLLM 
+```bash
+pip install https://vllm-wheels.s3.us-west-2.amazonaws.com/nightly/vllm-1.0.0.dev-cp38-abi3-manylinux1_x86_64.whl
+```
+
+Download code from forked git repo:
+```bash
+git clone https://github.com/sastec17/585_vllm.git
+cd 585_vllm
+```
+
+Run python build -> This makes it so anytime we run code that imports `vllm`, it will use our changes, rather than what was released by the devs - Pretty epic ngl :p
+```bash
+ python python_only_dev.py
+```
+
+Ideally we get this to run:
+```bash
+python examples/offline_inference.py 
+```
+
+Or we get something like this to run, which will serve vllm so we can access it via api call:
+```bash
+python -m vllm.entrypoints.api_server --model gpt2 --device cuda
+```
