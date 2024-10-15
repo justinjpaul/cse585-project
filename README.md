@@ -54,6 +54,9 @@ sudo apt install python3-pip
 IMPORTANT - Run on a GPU with compute capability of 7.0 or higher (see vLLM docs). The following are profiles I've cross-referenced w/Nvidia docs that should work:
 * d8545
 * nvidiagh
+* c4130
+
+See node availability [here](https://www.cloudlab.us/resinfo.php#)
 
 Install miniconda:
 ```bash
