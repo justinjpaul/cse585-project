@@ -62,16 +62,6 @@ I've been testing on c4130 on the Clemson cluster, but often requires some reser
 
 Note - There may be more profiles/nodes that I missed. Check out [Nvidia list](https://developer.nvidia.com/cuda-gpus) and cross reference with [CloudLab hardware](http://emulab.pages.flux.utah.edu/testbed-manual/cloudlab-manual/hardware.html). Not sure if that's a comprehensive Nvidia list atm
 
-Download cuda version 12: 
-```bash
-wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804x86_64/cuda-keyring_1.0-1_all.deb
-sudo dpkg -i cuda-keyring_1.0-1_all.deb
-sudo apt-get update
-sudo apt-get -y install cuda
-```
-Note that the above steps are for Linux Ubuntu version 18.04. If running on a different configuration, check [Nvidia](https://developer.nvidia.com/cuda-12-0-0-download-archive?target_os=Linux&target_arch=x86_64&Distribution=Ubuntu&target_version=18.04&target_type=deb_network) 
-
-Reboot the system with `sudo reboot` to gain access to cuda. This takes an annoying few minutes
 
 Download miniconda:
 ```bash
@@ -107,6 +97,20 @@ Run python build -> This makes it so anytime we run code that imports `vllm`, it
 ```bash
  python python_only_dev.py
 ```
+
+CURRENT ISSUE - NEED A SUFFICIENT CUDA DRIVER WITH CUDA 12: 
+Download cuda version 12: 
+```bash
+wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804x86_64/cuda-keyring_1.0-1_all.deb
+sudo dpkg -i cuda-keyring_1.0-1_all.deb
+sudo apt-get update
+sudo apt-get -y install cuda
+```
+Note that the above steps are for Linux Ubuntu version 18.04. If running on a different configuration, check [Nvidia](https://developer.nvidia.com/cuda-12-0-0-download-archive?target_os=Linux&target_arch=x86_64&Distribution=Ubuntu&target_version=18.04&target_type=deb_network) 
+
+Reboot the system with `sudo reboot` to gain access to cuda. This takes an annoying few minutes
+
+
 
 Ideally we get this to run:
 ```bash
