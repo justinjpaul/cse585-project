@@ -15,8 +15,59 @@ To run the script:
 * Be sure to ```pip install datasets``` (Will add to requirements.txt later)
 * Run `python bin/download_data.py`
 
+## Google Cloud
+See [this video](https://www.youtube.com/watch?v=XKxGWN7BlMs) for video walkthrough. Includes running vLLM as server, which is not listed below. 
 
-## Cloudlab info
+#### Prerequisites
+* Create / sign in to Google Cloud account
+* (Recommended) Set up [google command line](https://cloud.google.com/sdk/docs/install) - Could potentially streamline ssh process if there's an issue with ssh keys
+* Click "Activate" full account - Google offers a free $300 of compute credits for new Google Cloud users
+
+#### Request GPU increase
+* Go to Compute Engine. Click `Enable` Compute Engine.
+* Navigate to IAM->Quotas
+* In Filter, search for "All GPUs" - TODO FIX. 
+* Only one option should apepar. Select this and request a GPU increase > 0. This request will be reflected on Google Cloud within 15 minutes.
+
+#### Deploy a virtual machine
+* Create new instance of virtual machine. Instructions [here](https://cloud.google.com/compute/docs/instances/create-start-instance)
+* (Optional) Name VM
+* Select `Spot` for VM model provisioning model. 
+* Under `Spot`, set a time limit for X amount of time.
+
+##### Machine Configuration
+* Select Nvidia T4 and desired number of GPUs under GPUs tab
+* Select `n1-standard-8` machine type
+
+##### OS and Storage
+* Click `Change`
+* Set operating system to `Debian Learning on Linux`
+* Set version to be `Deep Learning VM with CUDA 12.1 125`. Be sure to select a version with at least Python version 3.8 and CUDA 12.1. 
+* Pick a size. I usually go for 100GB but we can play with this.
+
+##### Networking
+* Allow HTTP traffic
+* (Optional) Allow HTTPS traffic if you wanna send over HTTPS
+
+Click Create and watch VM instance deploy!
+
+To access VM, ssh into it via `ssh <external IP>` - Alternatively, click on `SSH` and either copy `gcloud` command to local terminal (will handle ssh keys for you), or open in web browser terminal. 
+
+#### Setup vLLM 
+From [vLLM](https://docs.vllm.ai/en/latest/getting_started/installation.html) setup guide: 
+```bash
+# (Recommended) Create a new conda environment.
+conda create -n myenv python=3.10 -y
+conda activate myenv
+
+# Install vLLM with CUDA 12.1.
+pip install vllm
+```
+Verify this works by running the offline inference example. * Create a python file called `example.py` 
+* Copy [this code](https://docs.vllm.ai/en/latest/getting_started/examples/offline_inference.html) into `example.py` 
+* Run via `python example.py` - Should get some outputs after all the gibberish
+
+## Cloudlab
 
 #### Hardware
 VLLM is run on CUDA so we need a node with a GPU. The different kinds are listed [here](https://docs.cloudlab.us/hardware.html). Probably the best one for us to use is the `c240g5` in Wisconsin. This can be specified in the `Parameterize` step for the experiment.
@@ -109,7 +160,6 @@ sudo apt-get -y install cuda
 Note that the above steps are for Linux Ubuntu version 18.04. If running on a different configuration, check [Nvidia](https://developer.nvidia.com/cuda-12-0-0-download-archive?target_os=Linux&target_arch=x86_64&Distribution=Ubuntu&target_version=18.04&target_type=deb_network) 
 
 Reboot the system with `sudo reboot` to gain access to cuda. This takes an annoying few minutes
-
 
 
 Ideally we get this to run:
