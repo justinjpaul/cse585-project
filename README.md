@@ -26,11 +26,11 @@ See [this video](https://www.youtube.com/watch?v=XKxGWN7BlMs) for video walkthro
 #### Request GPU increase
 * Go to Compute Engine. Click `Enable` Compute Engine.
 * Navigate to IAM->Quotas
-* In Filter, search for "All GPUs" - TODO FIX. 
+* In Filter, search for "GPUs (all regions)" 
 * Only one option should apepar. Select this and request a GPU increase > 0. This request will be reflected on Google Cloud within 15 minutes.
 
 #### Deploy a virtual machine
-* Create new instance of virtual machine. Instructions [here](https://cloud.google.com/compute/docs/instances/create-start-instance)
+* Create new instance of virtual machine. Instructions [here](https://cloud.google.com/compute/docs/instances/create-start-instance) (Continue in this README after reaching the instance creation screen)
 * (Optional) Name VM
 * Select `Spot` for VM model provisioning model. 
 * Under `Spot`, set a time limit for X amount of time.
@@ -49,7 +49,7 @@ See [this video](https://www.youtube.com/watch?v=XKxGWN7BlMs) for video walkthro
 * Allow HTTP traffic
 * (Optional) Allow HTTPS traffic if you wanna send over HTTPS
 
-Click Create and watch VM instance deploy!
+Click Create and watch VM instance deploy! You may have to retry multiple times if the configuration selected is not available
 
 To access VM, ssh into it via `ssh <external IP>` - Alternatively, click on `SSH` and either copy `gcloud` command to local terminal (will handle ssh keys for you), or open in web browser terminal. 
 
