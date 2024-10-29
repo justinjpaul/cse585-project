@@ -4,6 +4,7 @@ import pandas as pd
 import torch
 from datasets import Dataset
 from transformers import AutoTokenizer
+from utils import DEVICE
 
 
 def round_to_nearest_n(number, n) -> int:
@@ -47,8 +48,6 @@ def load_dataset(
             return_tensors="pt",
         )
 
-    ds.set_transform(encode)
-
     # Add the labels to the transformed output
     def transform(batch):
         encoded = encode(batch)
@@ -63,13 +62,10 @@ def load_dataset(
 
 
 if __name__ == "__main__":
-    # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    device = torch.device("mps")
-
     dataset = load_dataset(
         "data/chatbot_conversations.json",
         "google-bert/bert-base-uncased",
-        device,
+        DEVICE,
     )
     print(dataset)
     print(dataset[0])
