@@ -1,19 +1,25 @@
 from pathlib import Path
 
 import torch.nn as nn
-import wandb
+from dotenv import dotenv_values, load_dotenv
+from huggingface_hub import login
 from load_data import load_dataset
 from torch.utils.data import DataLoader, random_split
 from transformers import BertModel, Trainer, TrainingArguments
 from utils import DEVICE, MODEL_NAME, set_seed
 
-set_seed(585)
+import wandb
 
+set_seed(585)
+load_dotenv()
+CONFIG = dotenv_values()
+
+NEW_MODEL = "cse585bert"
 
 # Hyperparameters
 BATCH_SIZE = 16
 LEARNING_RATE = 1e-4
-EPOCHS = 3
+EPOCHS = 5
 TRAIN_TEST_SPLIT = 0.8  # Split into train (80%) and test (20%)
 
 dataset = load_dataset(Path("data/chatbot_conversations.json"), MODEL_NAME, DEVICE)
@@ -42,18 +48,23 @@ class BertSeqLengthPredictionModel(nn.Module):
         self.fc1 = nn.Linear(hidden_dim, hidden_dim)
         self.fc2 = nn.Linear(hidden_dim, 1)
 
-    def forward(self, input_ids, attention_mask):
+    def forward(self, input_ids, attention_mask, labels=None):
         outputs = self.bert(input_ids=input_ids, attention_mask=attention_mask)
 
         # Obtain the representations of [CLS] heads
         logits = outputs.last_hidden_state[:, 0, :]  # [CLS] token representation
 
         output = self.cls(logits)
-        output = self.fc1(output)
-        output = self.relu(self.cls(logits))
         output = self.relu(self.fc1(output))
         output = self.fc2(output).squeeze(-1)
-        return output
+
+        if labels is not None:
+            # If labels are provided, calculate MSE loss directly in the model
+            loss_fct = nn.MSELoss()
+            loss = loss_fct(output, labels.float())
+            return {"loss": loss, "logits": output}
+        else:
+            return {"logits": output}
 
 
 class RegressionTrainer(Trainer):
@@ -65,8 +76,15 @@ class RegressionTrainer(Trainer):
         loss = loss_fct(logits.squeeze(), labels.squeeze())
         return (loss, outputs) if return_outputs else loss
 
+    def predict_with_labels(self, test_dataset):
+        predictions, labels, _ = self.predict(test_dataset)
+        return predictions, labels
+
 
 def main():
+    login(token=CONFIG["HF_TOKEN"])
+    wandb.login(key=CONFIG["WANDB_API_KEY"])
+
     wandb.init(
         # set the wandb project where this run will be logged
         project="cse585bert",
@@ -86,7 +104,7 @@ def main():
 
     training_args = TrainingArguments(
         output_dir="response_prediction_model/checkpoints",  # Checkpoint directory
-        evaluation_strategy="epoch",  # Evaluate at the end of each epoch
+        eval_strategy="epoch",  # Evaluate at the end of each epoch
         logging_strategy="epoch",  # Log metrics at the end of each epoch
         save_strategy="epoch",  # Save model checkpoints at each epoch
         learning_rate=LEARNING_RATE,
@@ -95,6 +113,7 @@ def main():
         num_train_epochs=EPOCHS,
         weight_decay=0.01,
         report_to="wandb",  # Log to wandb
+        load_best_model_at_end=True,
     )
     trainer = RegressionTrainer(
         model=model,
@@ -103,6 +122,7 @@ def main():
         eval_dataset=test_dataset,
     )
     trainer.train()
+    trainer.save_model(NEW_MODEL)
 
     wandb.finish()
 
