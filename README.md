@@ -171,3 +171,29 @@ Or we get something like this to run, which will serve vllm so we can access it 
 ```bash
 python -m vllm.entrypoints.api_server --model gpt2 --device cuda
 ```
+
+## Bert Model Training
+Prereqs:
+- Need a [wandb](https://wandb.ai/) account and get access key
+- Need [HF](https://huggingface.co/) account and token
+- add these to .env file in format
+    ```
+    HF_TOKEN="hf_*****"
+    WANDB_API_KEY="****"
+    ```
+
+Training on Great Lakes:
+```bash
+sbatch response_prediction_model/model_train.sh
+```
+It seems like it is approximately 20min/epoch so used a time limit of 2 hours with 5 epochs
+
+Locally:
+```bash
+python response_prediction_model/model.py
+```
+
+Some errors
+- OOM error fixed in sbatch preamble ([docs](https://docs.support.arc.umich.edu/slurm/))
+- torch needs to be last install in requirements.txt file
+- transformers must be 4.45.2 (v4.46.* is incompatible)
