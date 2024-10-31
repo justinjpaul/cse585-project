@@ -123,6 +123,7 @@ def main():
     )
     trainer.train()
     trainer.save_model(NEW_MODEL)
+    trainer.push_to_hub(NEW_MODEL)
 
     wandb.finish()
 
