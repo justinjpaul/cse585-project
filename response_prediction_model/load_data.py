@@ -11,14 +11,18 @@ def round_to_nearest_n(number, n) -> int:
     return round(number / n) * n
 
 
-def load_df(path: Path, n=10) -> pd.DataFrame:
+def load_df(path: Path, model_name, n=10) -> pd.DataFrame:
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+
     df = pd.read_json(path)
 
     df[["eng", "length", "label"]] = df.apply(
         lambda row: (
             row["q"].isascii() and row["a"].isascii(),
-            len(row["a"]),
-            round_to_nearest_n(len(row["a"]), n),
+            len(tokenizer(row["a"], truncation=True, max_length=512)["input_ids"]),
+            round_to_nearest_n(
+                len(tokenizer(row["a"], truncation=True, max_length=512)["input_ids"]), n
+            ),
         ),
         axis=1,
         result_type="expand",
@@ -35,7 +39,7 @@ def load_dataset(
     n: int = 10,
     max_length: int = 512,
 ) -> Dataset:
-    df = load_df(path, n)
+    df = load_df(path, model_name, n)
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     ds = Dataset.from_pandas(df[["q", "a", "label"]])
 
