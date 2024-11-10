@@ -114,6 +114,7 @@ def main():
         weight_decay=0.01,
         report_to="wandb",  # Log to wandb
         load_best_model_at_end=True,
+        hub_model_id=f"justpaul/{NEW_MODEL}"
     )
     trainer = RegressionTrainer(
         model=model,
